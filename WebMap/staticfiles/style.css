@@ -10,7 +10,7 @@
         height: 75px;
         border: 1px;
         display: flex;
-        gap: 550px;
+        gap: 500px;
         flex-direction: row;
         justify-content: center;
         align-items: center;
@@ -48,32 +48,4 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 50px;
-}
-.btn-exit {
-    width: 80px;
-    height: 80px;
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.btn-exit img {
-    width: 100px;
-    height: 200px;
-}
-
-.map-card{
-    display: flex;
-    justify-content: center;
-}
-
-#map {
-    width: 100%;
-    height: 500px;
 }
