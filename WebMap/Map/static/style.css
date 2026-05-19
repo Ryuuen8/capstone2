@@ -3,26 +3,28 @@
     padding: 0;
     box-sizing: border-box;
 }
+
 .header {
-        padding-top: 10px;
-        padding-bottom: 10px;
-        background-color: rgb(29, 68, 107);
-        height: 75px;
-        border: 1px;
-        display: flex;
-        gap: 550px;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        border-color: black;
-    }
-.header h1{
-        color: rgb(255, 255, 255);
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;    
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: rgb(29, 68, 107);
+    height: 75px;
+    border: 1px;
+    display: flex;
+    gap: 550px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-color: black;
+}
+
+.header h1 {
+    color: rgb(255, 255, 255);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
 
 .search-field {
-    
+
     padding-bottom: 10px;
     padding-top: 10px;
     padding-left: 10px;
@@ -37,19 +39,21 @@
     border-color: #007bff;
 }
 
-.item-1 h1{
+.item-1 h1 {
     color: rgb(255, 255, 255);
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     text-shadow: 1px 2px 4px rgb(78, 127, 42);
 
 }
+
 /*Icons*/
-.icon-button{
+.icon-button {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 50px;
 }
+
 .btn-exit {
     width: 80px;
     height: 80px;
@@ -68,7 +72,7 @@
     height: 200px;
 }
 
-.map-card{
+.map-card {
     display: flex;
     justify-content: center;
 }

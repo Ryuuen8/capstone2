@@ -1,10 +1,12 @@
 from django.db import models
 
 # Create your models here.
-class FirstFloor(models.Model):
+class Location(models.Model):
     room_name = models.TextField(max_length=20)
-    y_coordinate = models.IntegerField(default=10, editable=False)
-    x_coordinate = models.IntegerField(default=0, unique=True)
+    y_coordinate = models.FloatField()
+    x_coordinate = models.FloatField()
     
-    class Meta:
-        pass
+class Connection(models.Model):
+    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="from_conn")
+    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="to_conn")
+    cost = models.FloatField()

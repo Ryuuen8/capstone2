@@ -1,5 +1,5 @@
 import math
 import heapq
 
-class Node:
+class Cell:
     pass

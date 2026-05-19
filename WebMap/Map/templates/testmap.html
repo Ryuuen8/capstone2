@@ -1,0 +1,33 @@
+{% load static %}
+{% block content %}
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="{% static "style.css" %}">
+            <title>Document</title>
+        </head>
+        <body>
+            <div class="Header">
+                <img src="{% static 'apple-maps.svg' %}" alt="test" height="50" width="50">
+                <div class="item-1">
+                    <h1>Navigation</h1>
+                </div>
+                <input type="text" placeholder="Search.." class="search-field">
+            </div>
+            <div class="icon-button">
+                <button class="btn-exit">
+                    <img src="{% static 'Exit_icon.svg' %}"
+                         alt="test"
+                         height="125"
+                         width="125">
+                    <a href="https://www.youtube.com/results?search_query=umapyoi+densetsu"></a>
+                </button>
+                <h1>Test2</h1>
+            </div>
+            <div class="map-card">
+                <div id="map-folium">{{ map|safe }}</div>
+            </div>
+        </body>
+    </html>
+{% endblock %}
