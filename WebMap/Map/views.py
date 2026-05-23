@@ -10,7 +10,6 @@ import networkx as nx
 # Create your views here.
 
 
-@ensure_csrf_cookie
 def pathfind(request):
 
     if request.method != "POST":
@@ -65,6 +64,7 @@ def pathfind(request):
     })
 
 #Pathfinding for the map using networtx for the a* algo
+@ensure_csrf_cookie
 def index(request):
     locations  = Location.objects.all()
     data = [
