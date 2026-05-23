@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["*"
 CSRF_TRUSTED_ORIGINS = [
     "http://192.168.254.197:8000",
     "https://b849-2001-fd8-481a-aa00-5c8f-3b85-bde6-3e81.ngrok-free.app",
+    "https://capstonetest-w9am.onrender.com",
 ]
 
 CSRF_COOKIE_SECURE =True    
