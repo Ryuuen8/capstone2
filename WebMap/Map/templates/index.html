@@ -5,6 +5,7 @@
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <link rel="stylesheet" href="{% static "style.css" %}">
+            <script src="{% static "script.js" %}"></script>
             <link rel="stylesheet"
                   href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
                   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
@@ -54,12 +55,20 @@
             <div id="map"></div>
             <div class="floor-container">
                 <div class="fmenu-container">
-                    <div class="floors-box">
+                    <button class="floors-box"
+                            id="floorBtn"
+                            aria-expanded="false"
+                            aria-controls="floorMenu">
                         <span class="floors">Floors</span>
+                    </button>
+                    <div class="floor-menu" id="floorMenu">
+                        <button class="floor-item">Ground Floor</button>
+                        <button class="floor-item">2nd Floor</button>
+                        <button class="floor-item">3rd Floor</button>
+                        <button class="floor-item">4th Floor</button>
                     </div>
                 </div>
             </div>
-            <!-- UI Overlay -->
             <div class="app-container">
                 <div class="menu-container">
                     <div class="menu-box">
@@ -79,7 +88,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Leaflet JS -->
             {{ locations|json_script:"locations-data" }}
             {{ path|json_script:"path-data" }}
             <script src="{% static "map.js" %}"></script>
