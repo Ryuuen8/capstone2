@@ -17,23 +17,17 @@ body {
     touch-action: manipulation;
 }
 
+/* Keep body neutral (don’t overpower map) */
 body {
     position: fixed;
     inset: 0;
     background: #0b1220;
-    font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Helvetica,
-        Arial,
-        sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 /* =========================
-   MAP
+   MAP (ASH BASE FIX)
 ========================= */
 
 #map {
@@ -42,18 +36,30 @@ body {
     width: 100%;
     height: 100dvh;
     z-index: 1;
-    background: #111827;
+
+    /* ash background */
+    background: radial-gradient(circle at center,
+            #f2f2f2 0%,
+            #d9d9d9 55%,
+            #cfcfcf 100%) !important;
 }
 
-/* Leaflet container */
-
+/* Leaflet container must NOT override ash */
 .leaflet-container {
-    background: #111827;
+    background: transparent !important;
     font-family: inherit;
     touch-action: pan-x pan-y;
 }
 
-/* Zoom controls */
+/* Make SVG map blend into ash world */
+.leaflet-image-layer {
+    filter: grayscale(20%) brightness(1.05) contrast(0.95);
+    opacity: 0.9;
+}
+
+/* =========================
+   ZOOM CONTROLS
+========================= */
 
 .leaflet-control-zoom {
     border: none !important;
@@ -65,18 +71,18 @@ body {
 .leaflet-control-zoom a {
     background: rgba(255, 255, 255, 0.95) !important;
     color: #111 !important;
-    border: none !important;
     width: 34px !important;
     height: 34px !important;
     line-height: 34px !important;
     font-size: 18px !important;
 }
 
-/* Popup */
+/* =========================
+   POPUPS
+========================= */
 
 .leaflet-popup-content-wrapper {
     border-radius: 18px;
-    padding: 4px;
 }
 
 .leaflet-popup-content {
@@ -84,11 +90,12 @@ body {
     margin: 10px 14px;
 }
 
-/* Marker glow */
+/* =========================
+   MARKERS
+========================= */
 
 .leaflet-marker-icon {
-    filter:
-        drop-shadow(0 0 4px cyan) drop-shadow(0 0 10px rgba(0, 255, 255, 0.7));
+    filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
 }
 
 /* =========================
@@ -102,7 +109,59 @@ body {
     border-radius: 12px;
     font-size: 12px;
     backdrop-filter: blur(10px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+/*==========================
+   FLOOR BUTTONs OVERLAY
+========================= */
+
+.floor-container {
+    position: absolute;
+    left: 0;
+    top: 25%;
+    transform: translateY(-25%);
+    z-index: 1000;
+}
+
+.fmenu-container {
+    position: fixed;
+
+    left: 0;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 3vw, 20px);
+
+    z-index: 1001;
+
+    pointer-events: auto;
+}
+
+.floors-box {
+    width: clamp(46px, 12vw, 78px);
+    height: clamp(46px, 12vw, 78px);
+
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: clamp(14px, 2vw, 22px);
+
+    transform: translateY(clamp(-20%, -10vw, -38%));
+    transition: 0.15s ease;
+
+    cursor: pointer;
+    user-select: none;
+
+    font-size: clamp(11px, 4vw, 25px);
+    font-family: Courier, monospace;
+    width: fit-content;
+    box-shadow: 0 clamp(2px, 0.6vw, 6px) clamp(6px, 1.5vw, 14px) rgba(0, 0, 0, 0.12);
 }
 
 /* =========================
@@ -114,16 +173,14 @@ body {
     inset: 0;
     z-index: 1000;
     pointer-events: none;
-    overflow: visible !important;
 }
 
 /* =========================
-   FLOATING MENU
+   MENU BAR
 ========================= */
 
 .menu-container {
     position: fixed;
-
     left: 50%;
     bottom: 14px;
     transform: translateX(-50%);
@@ -139,9 +196,7 @@ body {
     gap: clamp(8px, 3vw, 20px);
 
     background: rgba(255, 255, 255, 0.72);
-
     backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
 
     border-radius: 30px;
 
@@ -155,7 +210,7 @@ body {
 }
 
 /* =========================
-   MENU BUTTONS
+   BUTTONS
 ========================= */
 
 .menu-box {
@@ -163,7 +218,6 @@ body {
     height: clamp(52px, 15vw, 78px);
 
     background: white;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -171,25 +225,10 @@ body {
     border-radius: 22px;
 
     transform: translateY(-38%);
-
-    transition:
-        transform 0.15s ease,
-        background 0.15s ease,
-        box-shadow 0.15s ease;
+    transition: 0.15s ease;
 
     cursor: pointer;
-
-    border: none;
-    outline: none;
-
-    overflow: visible;
-
     user-select: none;
-}
-
-.menu-box:hover {
-    box-shadow:
-        0 10px 25px rgba(0, 0, 0, 0.12);
 }
 
 .menu-box:active {
@@ -197,22 +236,9 @@ body {
     background: #eef7fb;
 }
 
-/* Icons */
-
 .menu-box i {
     font-size: clamp(22px, 7vw, 34px);
     color: #19c3e6;
-
-    transition:
-        color 0.15s ease,
-        transform 0.15s ease;
-
-    pointer-events: none;
-}
-
-.menu-box:active i {
-    color: #0e9dc0;
-    transform: scale(0.95);
 }
 
 /* =========================
@@ -220,12 +246,6 @@ body {
 ========================= */
 
 @media (max-width: 768px) {
-
-    .coords-display {
-        font-size: 10px;
-        padding: 6px 10px !important;
-    }
-
     .menu-container {
         bottom: 10px;
         padding: 12px 14px 18px;
@@ -237,31 +257,208 @@ body {
     }
 }
 
-/* Landscape phones */
+/* =========================
+   GLOBAL
+========================= */
 
-@media (max-height: 500px) and (orientation: landscape) {
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
 
+html,
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+/* Keep body neutral (don’t overpower map) */
+body {
+    position: fixed;
+    inset: 0;
+    background: #0b1220;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* =========================
+   MAP (ASH BASE FIX)
+========================= */
+
+#map {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    z-index: 1;
+
+    /* ash background */
+    background: radial-gradient(circle at center,
+            #f2f2f2 0%,
+            #d9d9d9 55%,
+            #cfcfcf 100%) !important;
+}
+
+/* Leaflet container must NOT override ash */
+.leaflet-container {
+    background: transparent !important;
+    font-family: inherit;
+    touch-action: pan-x pan-y;
+}
+
+/* Make SVG map blend into ash world */
+.leaflet-image-layer {
+    filter: grayscale(20%) brightness(1.05) contrast(0.95);
+    opacity: 0.9;
+}
+
+/* =========================
+   ZOOM CONTROLS
+========================= */
+
+.leaflet-control-zoom {
+    border: none !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25) !important;
+}
+
+.leaflet-control-zoom a {
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #111 !important;
+    width: 34px !important;
+    height: 34px !important;
+    line-height: 34px !important;
+    font-size: 18px !important;
+}
+
+/* =========================
+   POPUPS
+========================= */
+
+.leaflet-popup-content-wrapper {
+    border-radius: 18px;
+}
+
+.leaflet-popup-content {
+    font-size: 14px;
+    margin: 10px 14px;
+}
+
+/* =========================
+   MARKERS
+========================= */
+
+.leaflet-marker-icon {
+    filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
+}
+
+/* =========================
+   COORD DISPLAY
+========================= */
+
+.coords-display {
+    background: rgba(0, 0, 0, 0.72) !important;
+    color: white;
+    padding: 8px 12px !important;
+    border-radius: 12px;
+    font-size: 12px;
+    backdrop-filter: blur(10px);
+}
+
+/* =========================
+   APP OVERLAY
+========================= */
+
+.app-container {
+    position: absolute;
+    inset: 0;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* =========================
+   MENU BAR
+========================= */
+
+.menu-container {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+
+    width: calc(100% - 24px);
+    max-width: 520px;
+
+    padding: 14px 18px 22px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(8px, 3vw, 20px);
+
+    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px);
+
+    border-radius: 30px;
+
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+    z-index: 1001;
+
+    pointer-events: auto;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.menu-box {
+    width: clamp(52px, 15vw, 78px);
+    height: clamp(52px, 15vw, 78px);
+
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 22px;
+
+    transform: translateY(-38%);
+    transition: 0.15s ease;
+
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-box:active {
+    transform: translateY(-34%) scale(0.93);
+    background: #eef7fb;
+}
+
+.menu-box i {
+    font-size: clamp(22px, 7vw, 34px);
+    color: #19c3e6;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
     .menu-container {
-        padding: 8px 12px 14px;
+        bottom: 10px;
+        padding: 12px 14px 18px;
+        border-radius: 24px;
     }
 
     .menu-box {
-        width: 48px;
-        height: 48px;
-        transform: translateY(-32%);
-    }
-
-    .menu-box i {
-        font-size: 20px;
-    }
-}
-
-/* Safe area for iPhones */
-
-@supports (padding-bottom: env(safe-area-inset-bottom)) {
-
-    .menu-container {
-        padding-bottom:
-            max(18px, env(safe-area-inset-bottom));
+        border-radius: 18px;
     }
 }

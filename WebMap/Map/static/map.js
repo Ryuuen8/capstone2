@@ -19,9 +19,7 @@ var map = L.map('map', {
     bounceAtZoomLimits: false
 });
 
-// =========================
-// MAP BOUNDS
-// =========================
+
 
 var bounds = [
     [0, 0],
@@ -37,19 +35,6 @@ L.imageOverlay(
     bounds
 ).addTo(map);
 
-// =========================
-// OPTIONAL GIF OVERLAY
-// =========================
-
-var videoUrl = "/static/evernight-everknight.gif";
-
-L.videoOverlay(videoUrl, bounds, {
-    opacity: 0.15
-}).addTo(map);
-
-// =========================
-// FIT MAP TO SCREEN
-// =========================
 
 if (window.innerWidth < 768) {
 
@@ -69,9 +54,6 @@ if (window.innerWidth < 768) {
 map.setMaxBounds(bounds);
 map.options.maxBoundsViscosity = 1.0;
 
-// =========================
-// FIX MOBILE RESIZE BUGS
-// =========================
 
 window.addEventListener("resize", () => {
     map.invalidateSize();
@@ -80,10 +62,6 @@ window.addEventListener("resize", () => {
         padding: [20, 20]
     });
 });
-
-// =========================
-// COORD DISPLAY
-// =========================
 
 var coordControl = L.control({
     position: 'bottomleft'
@@ -103,9 +81,6 @@ coordControl.onAdd = function () {
 
 coordControl.addTo(map);
 
-// =========================
-// LIVE COORDINATES
-// =========================
 
 map.on('mousemove', function (e) {
 
@@ -116,9 +91,6 @@ map.on('mousemove', function (e) {
         e.latlng.lng.toFixed(1);
 });
 
-// =========================
-// LOCATION DATA
-// =========================
 
 var locations = JSON.parse(
     document.getElementById(
@@ -126,9 +98,6 @@ var locations = JSON.parse(
     ).textContent
 );
 
-// =========================
-// PATH DATA
-// =========================
 
 var path = JSON.parse(
     document.getElementById(
@@ -138,9 +107,6 @@ var path = JSON.parse(
 
 console.log("PATH:", path);
 
-// =========================
-// INITIAL PATH VISUALIZATION
-// =========================
 
 if (path.length > 0) {
 
@@ -160,16 +126,10 @@ if (path.length > 0) {
     }).addTo(map);
 }
 
-// =========================
-// ROOM SELECTION
-// =========================
 
 let selected = [];
 let currentPath = null;
 
-// =========================
-// CREATE MARKERS
-// =========================
 
 locations.forEach(function(loc) {
 
@@ -181,10 +141,6 @@ locations.forEach(function(loc) {
     marker.bindPopup(`
         <b>${loc.room_name}</b>
     `);
-
-    // =====================
-    // CLICK EVENT
-    // =====================
 
     
 function getCSRFToken() {
