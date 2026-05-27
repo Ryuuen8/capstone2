@@ -178,7 +178,7 @@ body {
     flex-direction: column;
     gap: 6px;
 
-    min-width: 160px;
+    width: fit-content;
 
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 

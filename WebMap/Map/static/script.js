@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     const btn = document.getElementById("floorBtn");
+    const fbtn = document.getElementById("floor-item")
     const menu = document.getElementById("floorMenu");
 
     if (!btn || !menu) {

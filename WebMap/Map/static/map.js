@@ -1,147 +1,124 @@
+
 // =========================
 // MAP SETUP
 // =========================
 
 var map = L.map('map', {
     crs: L.CRS.Simple,
-
     minZoom: -2,
     maxZoom: 3,
-
     zoomSnap: 0.25,
     zoomDelta: 0.25,
-
     wheelPxPerZoomLevel: 120,
-
     touchZoom: true,
     tap: true,
-
     bounceAtZoomLimits: false
 });
 
+const bounds = [[0, 0], [1000, 1000]];
 
+const floors = {
+    1: {
+        image: L.imageOverlay('/static/hallways.svg', bounds),
+        layer: L.layerGroup()
+    },
+    2: {
+        image: L.imageOverlay('/static/hallways.svg', bounds),
+        layer: L.layerGroup()
+    },
+    3: {
+        image: L.imageOverlay('/static/hallways.svg', bounds),
+        layer: L.layerGroup()
+    }
+};
 
-var bounds = [
-    [0, 0],
-    [1000, 1000]
-];
+let currentFloor = 1;
+let currentPath = null;
+let selected = [];
 
-// =========================
-// SVG MAP
-// =========================
+function initFloors() {
+    Object.keys(floors).forEach((key) => {
+        const f = floors[key];
 
-L.imageOverlay(
-    '/static/hallways.svg',
-    bounds
-).addTo(map);
+        f.image.addTo(map);
+        f.layer.addTo(map);
 
-
-if (window.innerWidth < 768) {
-
-    map.fitBounds(bounds, {
-        padding: [40, 40]
-    });
-
-} else {
-
-    map.fitBounds(bounds, {
-        padding: [20, 20]
+        if (parseInt(key) !== currentFloor) {
+            map.removeLayer(f.image);
+            map.removeLayer(f.layer);
+        }
     });
 }
 
-// Prevent dragging outside map
+initFloors();
+
+map.fitBounds(bounds, {
+    padding: window.innerWidth < 768 ? [40, 40] : [20, 20]
+});
 
 map.setMaxBounds(bounds);
 map.options.maxBoundsViscosity = 1.0;
 
+let resizeTimer;
 
 window.addEventListener("resize", () => {
-    map.invalidateSize();
+    clearTimeout(resizeTimer);
 
-    map.fitBounds(bounds, {
-        padding: [20, 20]
-    });
+    resizeTimer = setTimeout(() => {
+        map.invalidateSize();
+
+        map.fitBounds(bounds, {
+            padding: window.innerWidth < 768 ? [40, 40] : [20, 20]
+        });
+    }, 150);
 });
 
-var coordControl = L.control({
-    position: 'bottomleft'
-});
+var coordControl = L.control({ position: 'bottomleft' });
 
 coordControl.onAdd = function () {
-
-    this._div = L.DomUtil.create(
-        'div',
-        'coords-display'
-    );
-
+    this._div = L.DomUtil.create('div', 'coords-display');
     this._div.innerHTML = "Move around map";
-
     return this._div;
 };
 
 coordControl.addTo(map);
 
-
 map.on('mousemove', function (e) {
-
     coordControl._div.innerHTML =
-        "Y: " +
-        e.latlng.lat.toFixed(1) +
-        " | X: " +
-        e.latlng.lng.toFixed(1);
+        "Y: " + e.latlng.lat.toFixed(1) +
+        " | X: " + e.latlng.lng.toFixed(1);
 });
 
-
 var locations = JSON.parse(
-    document.getElementById(
-        "locations-data"
-    ).textContent
+    document.getElementById("locations-data").textContent
 );
-
 
 var path = JSON.parse(
-    document.getElementById(
-        "path-data"
-    ).textContent
+    document.getElementById("path-data").textContent
 );
 
-console.log("PATH:", path);
+function drawPath(pathData) {
 
+    if (!pathData || pathData.length === 0) return;
 
-if (path.length > 0) {
+    if (currentPath) {
+        map.removeLayer(currentPath);
+    }
 
-    L.polyline.antPath(path, {
-        color: "#00E5FF",
-        weight: 12,
-        opacity: 0.2,
-        delay: 1200
-    }).addTo(map);
-
-    L.polyline.antPath(path, {
-        color: "#00E5FF",
-        weight: 5,
-        opacity: 1,
-        delay: 800,
-        pulseColor: "#FFFFFF"
+    currentPath = L.polyline.antPath(pathData, {
+    color: "#00E5FF",
+    weight: 6,
+    delay: 100,
+    dashArray: [10, 25],
+    pulseColor: "#ffffff",
+    paused: false,
+    reverse: false,
+    hardwareAccelerated: true
     }).addTo(map);
 }
 
+drawPath(path);
 
-
-let selected = [];
-let currentPath = null;
-
-locations.forEach(function(loc) {
-
-    let marker = L.marker([
-        loc.y_coordinate,
-        loc.x_coordinate
-    ]).addTo(map);
-
-    marker.bindPopup(`
-        <b>${loc.room_name}</b>
-    `);
-    
 function getCSRFToken() {
     const match = document.cookie
         .split('; ')
@@ -150,70 +127,122 @@ function getCSRFToken() {
     return match ? match.split('=')[1] : null;
 }
 
-marker.on("click", function () {
+locations.forEach(function(loc) {
 
-    console.log("CLICKED:", loc.room_name);
-    selected.push(loc.room_name);
-    console.log("Selected:", selected);
+    // 1. CREATE POLYGON instead of marker
+    const polygon = L.polygon(loc.coordinates, {
+        color: "transparent",
+        weight: 2,
+        fillOpacity: 0.15
+    }).addTo(map);
 
-    const csrftoken = getCSRFToken();
+    // 2. popup still works
+    polygon.bindPopup(`
+        <b>${loc.room_name}</b>
+    `);
 
-    if (!csrftoken) {
-        console.error("CSRF token missing — request blocked");
-        return;
+    // 3. CSRF helper (keep OUTSIDE ideally, but leaving here safe)
+    function getCSRFToken() {
+        const match = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='));
+
+        return match ? match.split('=')[1] : null;
     }
 
-    if (selected.length === 2) {
+    const btn = document.getElementById("nav-item")
+    // 4. CLICK EVENT ON POLYGON
+    polygon.on("click", function () {
 
-        console.log("Sending pathfind request...");
+        console.log("CLICKED:", loc.room_name);
 
-        fetch("/pathfind/", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": csrftoken
-            },
-            body: JSON.stringify({
-                start: selected[0],
-                end: selected[1]
+        selected.push(loc.room_name);
+        console.log("Selected:", selected);
+
+        const csrftoken = getCSRFToken();
+
+        if (!csrftoken) {
+            console.error("CSRF token missing — request blocked");
+            return;
+        }
+
+        // 5. WAIT UNTIL TWO SELECTIONS
+        if (selected.length === 2) {
+
+            console.log("Sending pathfind request...");
+
+            const start = selected[0];
+            const end = selected[1];
+
+            fetch("/pathfind/", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrftoken
+                },
+                body: JSON.stringify({
+                    start: start,
+                    end: end
+                })
             })
-        })
-        .then(async (response) => {
+            .then(async (response) => {
 
-            if (!response.ok) {
-                const text = await response.text();
-                console.error("SERVER ERROR:", text);
-                return;
-            }
+                if (!response.ok) {
+                    const text = await response.text();
+                    console.error("SERVER ERROR:", text);
+                    return;
+                }
 
-            return response.json();
-        })
-        .then(data => {
+                return response.json();
+            })
+            .then(data => {
 
-            if (!data) return;
+                if (!data) return;
 
-            console.log("PATH:", data.path);
+                console.log("PATH:", data.path);
 
-            // Remove old path safely
-            if (currentPath) {
-                map.removeLayer(currentPath);
-            }
+                // remove old path
+                if (currentPath) {
+                    map.removeLayer(currentPath);
+                }
 
-            // Draw new path
-            currentPath = L.polyline.antPath(data.path, {
-                color: "#00E5FF",
-                weight: 6,
-                delay: 800,
-                pulseColor: "#FFFFFF"
-            }).addTo(map);
+                // draw new path
+                currentPath = L.polyline.antPath(data.path, {
+                    color: "#00E5FF",
+                    weight: 6,
+                    delay: 800,
+                    pulseColor: "#FFFFFF"
+                }).addTo(map);
 
-        })
-        .catch(error => {
-            console.error("FETCH ERROR:", error);
-        });
+            })
+            .catch(error => {
+                console.error("FETCH ERROR:", error);
+            });
 
-        selected = [];
+            selected = [];
         }
     });
 });
+function switchFloor(floor) {
+
+    if (!floors[floor]) return;
+
+    // remove current
+    map.removeLayer(floors[currentFloor].image);
+    map.removeLayer(floors[currentFloor].layer);
+    map.removeLayer(currentPath)
+    currentFloor = floor;
+
+    // add new
+    map.addLayer(floors[currentFloor].image);
+    map.addLayer(floors[currentFloor].layer);
+}
+
+document.querySelectorAll(".floor-item").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const floor = parseInt(btn.dataset.floor);
+        switchFloor(floor);
+    });
+});
+
