@@ -1,4 +1,3 @@
-
 // =========================
 // MAP SETUP
 // =========================
@@ -35,6 +34,11 @@ const floors = {
 let currentFloor = 1;
 let currentPath = null;
 let selected = [];
+
+// =========================
+// PATHFINDING MODE TOGGLE
+// =========================
+let pathfindingMode = false;
 
 function initFloors() {
     Object.keys(floors).forEach((key) => {
@@ -98,7 +102,6 @@ var path = JSON.parse(
 );
 
 function drawPath(pathData) {
-
     if (!pathData || pathData.length === 0) return;
 
     if (currentPath) {
@@ -106,14 +109,14 @@ function drawPath(pathData) {
     }
 
     currentPath = L.polyline.antPath(pathData, {
-    color: "#00E5FF",
-    weight: 6,
-    delay: 100,
-    dashArray: [10, 25],
-    pulseColor: "#ffffff",
-    paused: false,
-    reverse: false,
-    hardwareAccelerated: true
+        color: "#00E5FF",
+        weight: 6,
+        delay: 100,
+        dashArray: [10, 25],
+        pulseColor: "#ffffff",
+        paused: false,
+        reverse: false,
+        hardwareAccelerated: true
     }).addTo(map);
 }
 
@@ -122,39 +125,61 @@ drawPath(path);
 function getCSRFToken() {
     const match = document.cookie
         .split('; ')
-        .find(row => row.startsWith('csrftoken='));
+        .find((row) => row.startsWith('csrftoken='));
 
     return match ? match.split('=')[1] : null;
 }
 
-locations.forEach(function(loc) {
+// =========================
+// TOGGLE PATHFINDING MODE WITH COMPASS BUTTON
+// =========================
+const compassBtn = document.querySelector('.fa-compass')?.closest('.nav-item');
+if (compassBtn) {
+    compassBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        pathfindingMode = !pathfindingMode;
 
-    // 1. CREATE POLYGON instead of marker
+        if (pathfindingMode) {
+            compassBtn.style.backgroundColor = '#00E5FF';
+            compassBtn.style.color = '#000';
+            compassBtn.style.borderRadius = '8px';
+            compassBtn.style.transition = 'all 0.3s ease';
+            // Change cursor style on map container
+            document.getElementById('map').style.cursor = 'crosshair';
+        } else {
+            compassBtn.style.backgroundColor = 'transparent';
+            compassBtn.style.color = '';
+            document.getElementById('map').style.cursor = '';
+            selected = [];
+        }
+    });
+} else {
+    console.error("Compass button not found");
+}
+
+// =========================
+// LOCATION CLICK HANDLER WITH MODE CHECK
+// =========================
+locations.forEach(function (loc) {
+    // CREATE POLYGON
     const polygon = L.polygon(loc.coordinates, {
         color: "transparent",
         weight: 2,
         fillOpacity: 0.15
     }).addTo(map);
 
-    // 2. popup still works
-    polygon.bindPopup(`
-        <b>${loc.room_name}</b>
-    `);
+    // popup
+    polygon.bindPopup(`<b>${loc.room_name}</b>`);
 
-    // 3. CSRF helper (keep OUTSIDE ideally, but leaving here safe)
-    function getCSRFToken() {
-        const match = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('csrftoken='));
-
-        return match ? match.split('=')[1] : null;
-    }
-
-    const btn = document.getElementById("nav-item")
-    // 4. CLICK EVENT ON POLYGON
+    // CLICK EVENT ON POLYGON
     polygon.on("click", function () {
-
-        console.log("CLICKED:", loc.room_name);
+        // CHECK IF PATHFINDING MODE IS ACTIVE
+        if (!pathfindingMode) {
+            console.log("Pathfinding mode disabled. Click the compass button first!");
+            return; // EXIT - don't proceed
+        }
+        // Only proceed if mode is active
+        console.log("CLICKED (pathfinding mode):", loc.room_name);
 
         selected.push(loc.room_name);
         console.log("Selected:", selected);
@@ -163,12 +188,21 @@ locations.forEach(function(loc) {
 
         if (!csrftoken) {
             console.error("CSRF token missing — request blocked");
+            selected = [];
             return;
         }
 
-        // 5. WAIT UNTIL TWO SELECTIONS
-        if (selected.length === 2) {
+        // Show feedback for first selection
+        if (selected.length === 1) {
+            polygon.bindPopup(`
+                <b>${loc.room_name}</b><br>
+                <small>✅ Start point selected. Now click destination.</small>
+            `).openPopup();
+            setTimeout(() => polygon.closePopup(), 1500);
+        }
 
+        // WAIT UNTIL TWO SELECTIONS
+        if (selected.length === 2) {
             console.log("Sending pathfind request...");
 
             const start = selected[0];
@@ -186,52 +220,55 @@ locations.forEach(function(loc) {
                     end: end
                 })
             })
-            .then(async (response) => {
+                .then(async (response) => {
+                    if (!response.ok) {
+                        const text = await response.text();
+                        console.error("SERVER ERROR:", text);
+                        return;
+                    }
 
-                if (!response.ok) {
-                    const text = await response.text();
-                    console.error("SERVER ERROR:", text);
-                    return;
-                }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (!data) return;
 
-                return response.json();
-            })
-            .then(data => {
+                    console.log("PATH:", data.path);
 
-                if (!data) return;
+                    // remove old path
+                    if (currentPath) {
+                        map.removeLayer(currentPath);
+                    }
 
-                console.log("PATH:", data.path);
+                    // draw new path
+                    currentPath = L.polyline.antPath(data.path, {
+                        color: "#00E5FF",
+                        weight: 6,
+                        delay: 800,
+                        pulseColor: "#FFFFFF"
+                    }).addTo(map);
 
-                // remove old path
-                if (currentPath) {
-                    map.removeLayer(currentPath);
-                }
-
-                // draw new path
-                currentPath = L.polyline.antPath(data.path, {
-                    color: "#00E5FF",
-                    weight: 6,
-                    delay: 800,
-                    pulseColor: "#FFFFFF"
-                }).addTo(map);
-
-            })
-            .catch(error => {
-                console.error("FETCH ERROR:", error);
-            });
+                    // Show success feedback
+                    alert(`✅ Path found from ${start} to ${end}!`);
+                })
+                .catch((error) => {
+                    console.error("FETCH ERROR:", error);
+                    alert("❌ Error finding path. Check console for details.");
+                });
 
             selected = [];
         }
     });
 });
-function switchFloor(floor) {
 
+function switchFloor(floor) {
     if (!floors[floor]) return;
 
     // remove current
     map.removeLayer(floors[currentFloor].image);
     map.removeLayer(floors[currentFloor].layer);
-    map.removeLayer(currentPath)
+    if (currentPath) {
+        map.removeLayer(currentPath);
+    }
     currentFloor = floor;
 
     // add new
@@ -239,10 +276,9 @@ function switchFloor(floor) {
     map.addLayer(floors[currentFloor].layer);
 }
 
-document.querySelectorAll(".floor-item").forEach(btn => {
+document.querySelectorAll(".floor-item").forEach((btn) => {
     btn.addEventListener("click", () => {
         const floor = parseInt(btn.dataset.floor);
         switchFloor(floor);
     });
 });
-

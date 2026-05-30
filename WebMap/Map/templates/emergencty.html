@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Emergency
+{% endblock title %}
+{% block nav_emergency %}
+    active
+{% endblock nav_emergency %}
+{% block content %}
+    <div class="app">
+        <!-- HEADER -->
+        <header class="emergency-header">
+            <a href="{% url "main" %}">
+                <i class="fa-solid fa-chevron-left"></i>
+            </a>
+            <h1>EMERGENCY</h1>
+            <i class="fa-solid fa-bell"></i>
+        </header>
+        <!-- CARDS -->
+        <section class="emergency-grid">
+            <div class="em-card fire">
+                <i class="fa-solid fa-fire"></i>
+                <div>
+                    <h3>FIRE</h3>
+                    <p>Report fire or smoke</p>
+                </div>
+            </div>
+            <div class="em-card medical">
+                <i class="fa-solid fa-circle-plus"></i>
+                <div>
+                    <h3>MEDICAL</h3>
+                    <p>Request medical assistance</p>
+                </div>
+            </div>
+            <div class="em-card security">
+                <i class="fa-solid fa-shield-halved"></i>
+                <div>
+                    <h3>SECURITY</h3>
+                    <p>Report security concern</p>
+                </div>
+            </div>
+            <div class="em-card hazard">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <h3>HAZARD</h3>
+                    <p>Report hazard or incident</p>
+                </div>
+            </div>
+        </section>
+        <!-- INSTRUCTIONS -->
+        <section class="emergency-info">
+            <h4>IN CASE OF EMERGENCY</h4>
+            <ul>
+                <li>
+                    <i class="fa-solid fa-person-walking"></i> Remain calm.
+                </li>
+                <li>
+                    <i class="fa-solid fa-route"></i> Use the nearest exit route.
+                </li>
+                <li>
+                    <i class="fa-solid fa-ban"></i> Do not use the elevator.
+                </li>
+                <li>
+                    <i class="fa-solid fa-flag"></i> Go to the assembly point.
+                </li>
+            </ul>
+        </section>
+        <!-- CALL BUTTON -->
+        <a href="tel:09912345678" class="emergency-call">
+            <i class="fa-solid fa-phone"></i>
+            <div>
+                <strong>CALL SECURITY</strong>
+                <span>099-1234-5678 local 911</span>
+            </div>
+        </a>
+    </div>
+{% endblock %}

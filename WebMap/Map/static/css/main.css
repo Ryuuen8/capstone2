@@ -1,0 +1,260 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #d9d9d9;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: auto;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+
+.app {
+    width: 100%;
+    max-width: 390px;
+    background: #f5f5f5;
+    min-height: 100vh;
+    position: relative;
+    padding-bottom: 90px;
+}
+
+/* HERO */
+
+.hero {
+    background: #04145d;
+    color: white;
+    padding: 28px 24px 50px;
+}
+
+.school-info {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.school-info img {
+    width: 72px;
+}
+
+.school-info h1 {
+    font-size: 1.6rem;
+    line-height: 1.1;
+    font-weight: 800;
+}
+
+.school-info span {
+    color: #ffd500;
+    font-weight: 700;
+    font-size: .95rem;
+}
+
+.hero p {
+    text-align: center;
+    margin-top: 22px;
+    font-size: .85rem;
+    letter-spacing: .5px;
+}
+
+/* ACTIONS */
+
+.actions {
+    background-color: #f5f5f5;
+    margin-top: -28px;
+    padding: 10px 24px;
+    display: grid;
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.action-card {
+    height: 140px;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    cursor: pointer;
+}
+
+.action-card i {
+    font-size: 2.7rem;
+    margin-bottom: 12px;
+}
+
+.action-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.action-card span {
+    font-size: .75rem;
+}
+
+.navigate {
+    background: #05115f;
+}
+
+.emergency {
+    background: #e10600;
+}
+
+/* QUICK ACCESS */
+
+.quick-access {
+    padding: 24px;
+}
+
+.quick-access h4 {
+    margin-bottom: 14px;
+    font-size: .85rem;
+    color: #444;
+}
+
+.quick-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.quick-item {
+    background: white;
+    border-radius: 12px;
+    height: 88px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+
+.quick-item a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: inherit;
+    text-decoration: none;
+}
+
+.quick-item i {
+    font-size: 1.3rem;
+    color: #0d8a4b;
+    margin-bottom: 8px;
+}
+
+.quick-item span {
+    font-size: .65rem;
+    text-align: center;
+}
+
+/* LOCATION */
+
+.location-card {
+    margin: 0 24px;
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    background: #162c9f;
+    border-radius: 50%;
+    margin-top: 4px;
+}
+
+.location-card small {
+    color: #777;
+    font-size: .7rem;
+}
+
+.location-card h3 {
+    color: #162c9f;
+    margin-top: 2px;
+}
+
+.location-card p {
+    font-size: .8rem;
+    color: #666;
+    margin-top: 4px;
+}
+
+/* BOTTOM NAV */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 390px;
+    height: 75px;
+
+    background: white;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    border-top: 1px solid #ddd;
+    z-index: 9999;
+}
+
+.bottom-nav a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    color: #777;
+    text-decoration: none;
+    font-size: .65rem;
+}
+
+.bottom-nav i {
+    font-size: 1.25rem;
+}
+
+.bottom-nav .active {
+    color: #05115f;
+}
+
+.scan-btn-container {
+    right: 59%;
+    transform: translateX(10%);
+    bottom: 25px;
+}
+
+.scan-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    border: 3px solid #2d5cff;
+    margin-top: -35px;
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+}
+
+.scan-btn i {
+    font-size: 1.4rem;
+    color: #2d5cff;
+}

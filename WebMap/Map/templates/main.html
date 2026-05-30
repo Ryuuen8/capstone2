@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Home
+{% endblock title %}
+{% block nav_home %}
+    active
+{% endblock nav_home %}
+{% block content %}
+    <link rel="stylesheet" href="{% static "css/main.css" %}">
+    <script src="{% static "js/mainscript.js" %}"></script>
+    <body>
+        <div class="app">
+            <!-- HEADER -->
+            <header class="hero">
+                <div class="school-info">
+                    <img src="{% static "images/icct-logo-square.png" %}" alt="ICCT Logo">
+                    <div>
+                        <h1>ICCT COLLEGES CAINTA</h1>
+                        <span>MAIN CAMPUS</span>
+                    </div>
+                </div>
+                <p>INDOOR NAVIGATION & EMERGENCY GUIDE</p>
+            </header>
+            <!-- ACTION BUTTONS -->
+            <section class="actions">
+                <div class="action-card navigate">
+                    <i class="fa-solid fa-route"></i>
+                    <h3>NAVIGATE</h3>
+                    <span>Find your way</span>
+                </div>
+                <div class="action-card emergency">
+                    <i class="fa-solid fa-person-running"></i>
+                    <h3>EMERGENCY</h3>
+                    <span>Get help</span>
+                </div>
+            </section>
+            <!-- QUICK ACCESS -->
+            <section class="quick-access">
+                <h4>QUICK ACCESS</h4>
+                <div class="quick-grid">
+                    <div class="quick-item">
+                        <a href="{% url 'floormap' %}">
+                            <i class="fa-solid fa-map-location-dot"></i>
+                            <span>Floor Maps</span>
+                        </a>
+                    </div>
+                    <div class="quick-item">
+                        <i class="fa-solid fa-people-group"></i>
+                        <span>Assembly Point</span>
+                    </div>
+                    <div class="quick-item">
+                        <i class="fa-solid fa-shield-heart"></i>
+                        <span>Safety Tips</span>
+                    </div>
+                    <div class="quick-item">
+                        <i class="fa-solid fa-phone"></i>
+                        <span>Contact Security</span>
+                    </div>
+                    <div class="quick-item">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>Report Hazard</span>
+                    </div>
+                    <div class="quick-item">
+                        <i class="fa-solid fa-bell"></i>
+                        <span>Announcement</span>
+                    </div>
+                </div>
+            </section>
+            <!-- LOCATION CARD -->
+            <section class="location-card">
+                <div class="dot"></div>
+                <div>
+                    <small>CURRENT LOCATION</small>
+                    <h3>Fourth Floor</h3>
+                    <p>Near Lecture Room (R46)</p>
+                </div>
+            </section>
+            <section id="contact-section">
+            </section>
+        </div>
+    </body>
+</html>
+{% endblock %}

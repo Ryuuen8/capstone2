@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load static %}
+<!DOCTYPE html>
+{% block content %}
+    <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+            <link rel="stylesheet" href="{% static "css/floor-maps.css" %}">
+            <script sr></script>
+            <title>Floor Maps · Select Destination</title>
+            <!-- Font Awesome 6 (free icons) -->
+            <link rel="stylesheet"
+                  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+        </head>
+        <body>
+            <div class="panel-header">
+                <h2>
+                    <i class="fas fa-location-dot"></i>
+                    Select Destination
+                </h2>
+            </div>
+            <div class="search-row">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text"
+                           id="searchInput"
+                           placeholder="Search for a room, lab or area..."
+                           autocomplete="off">
+                </div>
+            </div>
+            <div class="filter-tabs" id="filterTabs">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="Rooms">Rooms</button>
+                <button class="filter-btn" data-filter="Labs">Labs</button>
+                <button class="filter-btn" data-filter="Areas">Areas</button>
+            </div>
+            <div class="destination-list" id="destinationList">
+                <!-- dynamic items injected from js -->
+            </div>
+        </div>
+    </div>
+    <script src="{% static "js/fmapscript.js" %}"></script>
+</body>
+</html>
+{% endblock content %}
