@@ -3,8 +3,22 @@ from django.urls import reverse
 from django.utils.html import format_html
 # Create your models here.
 class Location(models.Model):
+    STAIR_TYPE_ENTRANCE = "entrance"
+    STAIR_TYPE_EXIT = "exit"
+    STAIR_TYPE_CHOICES = [
+        (STAIR_TYPE_ENTRANCE, "Entrance"),
+        (STAIR_TYPE_EXIT, "Exit"),
+    ]
+
     floor_location = models.IntegerField(default=1)
     room_name = models.TextField(max_length=20)
+    stair_type = models.CharField(
+        max_length=10,
+        choices=STAIR_TYPE_CHOICES,
+        blank=True,
+        null=True,
+        help_text="Optional explicit stair direction for stair nodes.",
+    )
     coordinates = models.JSONField(default=list)
     y_coordinate = models.FloatField()
     x_coordinate = models.FloatField()

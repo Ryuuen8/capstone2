@@ -5,7 +5,6 @@ from folium.plugins import MousePosition, AntPath, Search
 from .models import Location, Connection
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.db.models import Q
-from .models import Location, Connection
 import json
 import networkx as nx
 import math
@@ -41,12 +40,23 @@ def pathfind(request):
     end = data["end"]
     G = nx.DiGraph()
 
-    locations = Location.objects.all()
+    locations = list(Location.objects.all())
+    stair_x = [loc.x_coordinate for loc in locations if "stair" in loc.room_name.lower()]
+    stair_threshold = (min(stair_x) + max(stair_x)) / 2 if stair_x else 0
 
     for loc in locations:
+        stair_type = loc.stair_type
+        if stair_type is None and "stair" in loc.room_name.lower():
+            stair_type = (
+                Location.STAIR_TYPE_ENTRANCE
+                if loc.x_coordinate > stair_threshold
+                else Location.STAIR_TYPE_EXIT
+            )
+
         G.add_node(
             loc.room_name,
-            pos=(loc.x_coordinate, loc.y_coordinate, loc.floor_location)
+            pos=(loc.x_coordinate, loc.y_coordinate, loc.floor_location),
+            stair_type=stair_type,
         )
 
     for conn in Connection.objects.all():
@@ -80,6 +90,16 @@ def pathfind(request):
     H.add_nodes_from(G.nodes(data=True))
     for u, v, data in G.edges(data=True):
         floor_diff = data.get("floor_diff", 0)
+        u_type = G.nodes[u].get("stair_type")
+        v_type = G.nodes[v].get("stair_type")
+
+        if allowed_direction == "up":
+            if u_type == "exit" or v_type == "exit":
+                continue
+        elif allowed_direction == "down":
+            if u_type == "entrance" or v_type == "entrance":
+                continue
+
         if floor_diff == 0 or allowed_direction is None:
             H.add_edge(u, v, **data)
         elif allowed_direction == "up" and floor_diff > 0:
