@@ -1,8 +1,9 @@
 import qrcode
 import json
+from urllib.parse import quote_plus
 
 # Example: Create QR codes for different locations
-# Format: /map/locate?x=<x_coord>&y=<y_coord>&floor=<floor>&name=<room_name>
+# Format: /locate?x=<x_coord>&y=<y_coord>&floor=<floor>&name=<room_name>
 
 locations_to_encode = [
     {"x": 499.22, "y": 757.31, "floor": 1, "name": "Library"},
@@ -17,8 +18,11 @@ for loc in locations_to_encode:
         box_size=10,
         border=4,
     )
-    # Encode as URL with parameters
-    qr_data = f"http://capstonetest-w9am.onrender.com/map/locate/?x={loc['x']}&y={loc['y']}&floor={loc['floor']}&name={loc['name']}"
+    # Encode as URL with parameters, using the app's current locate path.
+    qr_data = (
+        "https://capstonetest-w9am.onrender.com/locate/"
+        f"?x={loc['x']}&y={loc['y']}&floor={loc['floor']}&name={quote_plus(loc['name'])}"
+    )
     qr.add_data(qr_data)
     qr.make(fit=True)
     

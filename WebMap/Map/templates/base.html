@@ -65,7 +65,7 @@
 
             function processScannedUrl(scannedUrl) {
                 try {
-                    if (scannedUrl.includes('/map/locate/')) {
+                    if (scannedUrl.includes('/locate/')) {
                         const url = new URL(scannedUrl);
                         const x = url.searchParams.get('x');
                         const y = url.searchParams.get('y');
@@ -214,11 +214,10 @@
                 <span>Map</span>
             </a>
             <!-- CENTER SCAN BUTTON -->
-            <div id="reader" class="scan-btn-container">
-                <a onclick="scan()" class="scan-btn">
-                    <i class="fa fa-qrcode"></i>
-                </a>
-            </div>
+            <div id="reader" class="scan-btn-container"></div>
+            <a onclick="scan()" class="scan-btn">
+                <i class="fa fa-qrcode"></i>
+            </a>
             <a href="{% url 'emergency' %}"
                class="{% block nav_emergency %}{% endblock %}">
                 <i class="fa fa-exclamation-circle"></i>
