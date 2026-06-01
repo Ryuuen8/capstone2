@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
     floorOptions.forEach(option => {
         option.addEventListener('click', () => {
             const floor = option.getAttribute('data-floor');
-            // Redirect to floormap with floor parameter
+            // Redirect to floormap
             window.location.href = `/floormap/?floor=${floor}`;
         });
     });

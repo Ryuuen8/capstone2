@@ -5,12 +5,13 @@ from folium.plugins import MousePosition, AntPath, Search
 from .models import Location, Connection
 from django.views.decorators.csrf import ensure_csrf_cookie, csrf_exempt
 from django.db.models import Q
+from .models import Location, Connection
 import json
 import networkx as nx
 import math
 # Create your views here.
 def floormap(request):
-    locations = Location.objects.filter(room_name__startswith="R")
+    locations = Location.objects.filter(Q(room_name__startswith="R") | Q(room_name__startswith="B"))
     context = {'room_name':  locations}
         
     return render(request,'floor-maps.html', context)
@@ -21,7 +22,14 @@ def testmap(request):
 def emergency(request):
     return render(request, 'emergencty.html')
 
+ # API: pathfinding endpoint
 def pathfind(request):
+    """Handle POST requests to compute a path between two rooms.
+
+    Expects JSON `{ "start": <room>, "end": <room> }` and returns
+    a JSON object with `path` (flat [y,x,floor] coords) and `segments`
+    (grouped by floor) for client rendering.
+    """
     if request.method != "POST":
         return JsonResponse({
             "error": "POST request required"
@@ -63,18 +71,49 @@ def pathfind(request):
     )
 
     full_coords = []
+    segments = []
+    current_floor = None
+    current_segment = []
 
     for node in path:
         x, y, floor = G.nodes[node]["pos"]
         full_coords.append([y, x, floor])
 
+        if current_floor is None:
+            current_floor = floor
+            current_segment = [[y, x]]
+            continue
+
+        if floor != current_floor:
+            if len(current_segment) >= 2:
+                segments.append({
+                    "floor": current_floor,
+                    "coords": current_segment
+                })
+            current_floor = floor
+            current_segment = [[y, x]]
+        else:
+            current_segment.append([y, x])
+
+    if len(current_segment) >= 2:
+        segments.append({
+            "floor": current_floor,
+            "coords": current_segment
+        })
+
     return JsonResponse({
-        "path": full_coords
+        "path": full_coords,
+        "segments": segments
     })
 
-#Pathfinding for the map using networtx for the a* algo
 @ensure_csrf_cookie
 def index(request):
+    """Render the main index used by the map UI.
+
+    This view collects `Location` objects and embeds their coordinates
+    into the template so the frontend can render room polygons and
+    build a client-side graph view.
+    """
     locations  = Location.objects.all()
     data = [
         {
@@ -123,7 +162,11 @@ def admin_dashboard(request):
 
 @csrf_exempt
 def save_room(request):
-    
+    """Save room polygons from the map editor.
+
+    Expects POST JSON with `rooms` array; creates `Location` rows.
+    """
+
     if request.method == "POST":
 
         data = json.loads(request.body)

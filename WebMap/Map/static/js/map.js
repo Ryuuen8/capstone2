@@ -1,6 +1,4 @@
-// =========================
 // MAP SETUP
-// =========================
 console.log("MAP JS LOADED");
 console.log("navbtn at load:", document.getElementById("navbtn"));
 var map = L.map('map', {
@@ -44,10 +42,33 @@ let currentFloor = 1;
 let currentPath = null;
 let selected = [];
 
-// =========================
+// Brief: client-side map controller used on the floor map pages.
+// - Shows floor overlays, handles floor switching
+// - Toggles a one-time "pathfinding" mode via the nav button
+// - Collects two location clicks, POSTs to `/pathfind/`, and draws the returned path
+
 // PATHFINDING MODE TOGGLE
-// =========================
 let pathfindingMode = false;
+
+function setPathfindingMode(active) {
+    pathfindingMode = active;
+
+    if (compassBtn) {
+        if (active) {
+            compassBtn.style.backgroundColor = '#00E5FF';
+            compassBtn.style.color = '#000';
+            compassBtn.style.borderRadius = '8px';
+            compassBtn.style.transition = 'all 0.3s ease';
+            document.getElementById('map').style.cursor = 'crosshair';
+        } else {
+            compassBtn.style.backgroundColor = 'transparent';
+            compassBtn.style.color = '';
+            document.getElementById('map').style.cursor = '';
+            // Clear selections when disabling pathfinding so users start fresh
+            selected = [];
+        }
+    }
+}
 
 function initFloors() {
     Object.keys(floors).forEach((key) => {
@@ -110,24 +131,101 @@ var path = JSON.parse(
     document.getElementById("path-data").textContent
 );
 
-function drawPath(pathData) {
-    if (!pathData || pathData.length === 0) return;
+const currentPathLayers = [];
 
-    if (currentPath) {
-        map.removeLayer(currentPath);
+function clearCurrentPath() {
+    currentPathLayers.forEach((layer) => {
+        if (map.hasLayer(layer)) {
+            map.removeLayer(layer);
+        }
+    });
+    currentPathLayers.length = 0;
+}
+
+function splitPathIntoFloorSegments(pathCoords) {
+    const segments = [];
+    let currentFloor = null;
+    let currentSegment = [];
+
+    pathCoords.forEach((coord) => {
+        const [lat, lng, floor] = coord;
+
+        if (currentFloor === null) {
+            currentFloor = floor;
+            currentSegment = [[lat, lng]];
+            return;
+        }
+
+        if (floor !== currentFloor) {
+            if (currentSegment.length >= 2) {
+                segments.push({
+                    floor: currentFloor,
+                    coords: currentSegment
+                });
+            }
+            currentFloor = floor;
+            currentSegment = [[lat, lng]];
+        } else {
+            currentSegment.push([lat, lng]);
+        }
+    });
+
+    if (currentSegment.length >= 2) {
+        segments.push({
+            floor: currentFloor,
+            coords: currentSegment
+        });
     }
 
-    currentPath = L.polyline.antPath(pathData, {
-        color: "#00E5FF",
-        weight: 6,
-        delay: 100,
-        dashArray: [10, 25],
-        pulseColor: "#ffffff",
-        paused: false,
-        reverse: false,
-        hardwareAccelerated: true
-    }).addTo(map);
+    return segments;
 }
+
+// Helper: split returned path coordinates into contiguous floor segments
+
+
+
+function drawPath(pathData) {
+    if (!pathData) return;
+
+    clearCurrentPath();
+
+    let segments = [];
+
+    if (Array.isArray(pathData)) {
+        if (pathData.length === 0) return;
+        // Full path with floor as third coordinate
+        if (Array.isArray(pathData[0]) && pathData[0].length >= 3) {
+            segments = splitPathIntoFloorSegments(pathData);
+        } else {
+            segments = [{ floor: currentFloor, coords: pathData }];
+        }
+    } else if (pathData.segments) {
+        segments = pathData.segments;
+    }
+
+    segments.forEach((segment) => {
+        const layer = L.polyline.antPath(segment.coords, {
+            color: "#00E5FF",
+            weight: 6,
+            delay: 100,
+            dashArray: [10, 25],
+            pulseColor: "#ffffff",
+            paused: false,
+            reverse: false,
+            hardwareAccelerated: true
+        });
+
+        layer.segmentFloor = segment.floor;
+        currentPathLayers.push(layer);
+
+        if (segment.floor === currentFloor) {
+            map.addLayer(layer);
+        }
+    });
+}
+
+// Draws the path layers for the current floor and stores them in
+// `currentPathLayers` so they can be cleared or toggled when switching floors.
 
 drawPath(path);
 
@@ -139,9 +237,7 @@ function getCSRFToken() {
     return match ? match.split('=')[1] : null;
 }
 
-// =========================
 // TOGGLE PATHFINDING MODE WITH COMPASS BUTTON
-// =========================
 const compassBtn = document.getElementById('navbtn');
 if (compassBtn) {
     compassBtn.addEventListener('click', (e) => {
@@ -153,7 +249,6 @@ if (compassBtn) {
             compassBtn.style.color = '#000';
             compassBtn.style.borderRadius = '8px';
             compassBtn.style.transition = 'all 0.3s ease';
-            // Change cursor style on map container
             document.getElementById('map').style.cursor = 'crosshair';
         } else {
             compassBtn.style.backgroundColor = 'transparent';
@@ -166,27 +261,25 @@ if (compassBtn) {
     console.error("Compass button not found");
 }
 
-// =========================
+
 // LOCATION CLICK HANDLER WITH MODE CHECK
-// =========================
 locations.forEach(function (loc) {
-    // CREATE POLYGON
     const polygon = L.polygon(loc.coordinates, {
         color: "transparent",
         weight: 2,
-        fillOpacity: 0.15
-    }).addTo(map);
-
-    // popup
+            fillOpacity: 0.15
+    }).addTo(floors[loc.floor].layer);
     polygon.bindPopup(`<b>${loc.room_name}</b>`);
 
-    // CLICK EVENT ON POLYGON
     polygon.on("click", function () {
-        // CHECK IF PATHFINDING MODE IS ACTIVE
         if (!pathfindingMode) {
             console.log("Pathfinding mode disabled. Click the compass button first!");
             return; // EXIT - don't proceed
         }
+        // When active: collect the clicked room name. After two clicks a
+        // POST is sent to the server to compute a route. The client will
+        // then draw the route and automatically deactivate the nav button
+        // so the user must re-enable pathfinding for another route.
         // Only proceed if mode is active
         console.log("CLICKED (pathfinding mode):", loc.room_name);
 
@@ -242,18 +335,8 @@ locations.forEach(function (loc) {
 
                     console.log("PATH:", data.path);
 
-                    // remove old path
-                    if (currentPath) {
-                        map.removeLayer(currentPath);
-                    }
-
-                    // draw new path
-                    currentPath = L.polyline.antPath(data.path, {
-                        color: "#00E5FF",
-                        weight: 6,
-                        delay: 800,
-                        pulseColor: "#FFFFFF"
-                    }).addTo(map);
+                    // draw new path segments
+                    drawPath(data);
 
                     // Show success feedback
                     alert(`✅ Path found from ${start} to ${end}!`);
@@ -274,14 +357,23 @@ function switchFloor(floor) {
     // remove current
     map.removeLayer(floors[currentFloor].image);
     map.removeLayer(floors[currentFloor].layer);
-    if (currentPath) {
-        map.removeLayer(currentPath);
-    }
+    currentPathLayers.forEach((layer) => {
+        if (map.hasLayer(layer)) {
+            map.removeLayer(layer);
+        }
+    });
+
     currentFloor = floor;
 
     // add new
     map.addLayer(floors[currentFloor].image);
     map.addLayer(floors[currentFloor].layer);
+
+    currentPathLayers.forEach((layer) => {
+        if (layer.segmentFloor === currentFloor) {
+            map.addLayer(layer);
+        }
+    });
 }
 
 document.querySelectorAll(".floor-item").forEach((btn) => {

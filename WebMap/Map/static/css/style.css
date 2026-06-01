@@ -1,32 +1,27 @@
-/* GLOBAL */
+/* Minimal refactor: consolidated rules and reduced comments */
 
+/* Reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent
 }
 
-html,
-body {
+html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    touch-action: manipulation;
+    touch-action: manipulation
 }
 
-/* Keep body neutral */
+/* Base layout */
 body {
     position: fixed;
     inset: 0;
     background: #0b1220;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif
 }
-
-/* =========================
-   MAP (ASH BASE FIX)
-========================= */
 
 #map {
     position: fixed;
@@ -34,504 +29,439 @@ body {
     width: 100%;
     height: 100dvh;
     z-index: 1;
-
-    /* ash background */
-    background: radial-gradient(circle at center,
-            #f2f2f2 0%,
-            #d9d9d9 55%,
-            #cfcfcf 100%) !important;
+    background: radial-gradient(circle at center, #f2f2f2 0%, #d9d9d9 55%, #cfcfcf 100%) !important
 }
 
-/* Leaflet container must NOT override ash */
+/* Leaflet tweaks */
 .leaflet-container {
     background: transparent !important;
     font-family: inherit;
-    touch-action: pan-x pan-y;
+    touch-action: pan-x pan-y
 }
 
-/* Make SVG map blend into ash world */
 .leaflet-image-layer {
     filter: grayscale(20%) brightness(1.05) contrast(0.95);
-    opacity: 0.9;
+    opacity: .9
 }
 
-/* =========================
-   ZOOM CONTROLS
-========================= */
-
+/* Controls */
 .leaflet-control-zoom {
     border: none !important;
     border-radius: 16px !important;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .25) !important
 }
 
 .leaflet-control-zoom a {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(255, 255, 255, .95) !important;
     color: #111 !important;
     width: 34px !important;
     height: 34px !important;
     line-height: 34px !important;
-    font-size: 18px !important;
+    font-size: 18px !important
 }
 
-/* =========================
-   POPUPS
-========================= */
-
+/* Popups & markers */
 .leaflet-popup-content-wrapper {
-    border-radius: 18px;
+    border-radius: 18px
 }
 
 .leaflet-popup-content {
     font-size: 14px;
-    margin: 10px 14px;
+    margin: 10px 14px
 }
-
-/* =========================
-   MARKERS
-========================= */
 
 .leaflet-marker-icon {
-    filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
+    filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 10px rgba(0, 255, 255, .6))
 }
 
-/* =========================
-   COORD DISPLAY
-========================= */
-
+/* Coordinate display */
 .coords-display {
-    background: rgba(0, 0, 0, 0.72) !important;
-    color: white;
+    background: rgba(0, 0, 0, .72) !important;
+    color: #fff;
     padding: 8px 12px !important;
     border-radius: 12px;
     font-size: 12px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px)
 }
 
-/*Action Buttons*/
-
+/* Action/floor controls */
 .action-container {
     position: absolute;
     right: 0;
     top: 25%;
-    transform: translateY(-25%);
-    transform: translateX(-25%);
-    z-index: 1000;
+    transform: translateY(-25%) translateX(-25%);
+    z-index: 1000
 }
 
 .action-container button {
     align-items: center;
-    background-color: white;
-    border: 3px solid;
-    border-color: transparent;
+    background: #fff;
+    border: 3px solid transparent;
     border-radius: 50%;
-    box-shadow: 0 clamp(2px, 0.6vw, 6px) clamp(6px, 1.5vw, 14px) rgba(0, 0, 0, 0.12);
+    box-shadow: 0 clamp(2px, 0.6vw, 6px) clamp(6px, 1.5vw, 14px) rgba(0, 0, 0, .12);
     height: 40px;
-    width: 40px;
+    width: 40px
 }
 
 .action-container button:hover {
-    background-color: #f2f2f2;
-    cursor: pointer;
+    background: #f2f2f2;
+    cursor: pointer
 }
 
-/*==========================
-   FLOOR BUTTONs OVERLAY
-========================= */
-
-.floor-container {
-    position: absolute;
-    left: 0;
-    top: 25%;
-    transform: translateY(-25%);
-    z-index: 1000;
-}
-
-/* FIXED: keep container as anchor only */
 .fmenu-container {
     position: fixed;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-
     display: flex;
     flex-direction: column;
-    /* important for dropdown stacking */
     align-items: flex-start;
-
     gap: 10px;
-
-    z-index: 1001;
+    z-index: 1001
 }
 
-/* BUTTON */
 .floors-box {
     all: unset;
-
     width: clamp(46px, 12vw, 78px);
     height: clamp(46px, 12vw, 78px);
-
-    background: white;
+    background: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-
     border-radius: clamp(14px, 2vw, 22px);
-
     cursor: pointer;
     user-select: none;
-
     font-size: clamp(12px, 4vw, 20px);
     font-family: 'Courier New', Courier, monospace;
-    width: fit-content;
-    box-shadow: 0 clamp(2px, 0.6vw, 6px) clamp(6px, 1.5vw, 14px) rgba(0, 0, 0, 0.12);
-
-    transition: 0.15s ease;
+    box-shadow: 0 clamp(2px, 0.6vw, 6px) clamp(6px, 1.5vw, 14px) rgba(0, 0, 0, .12);
+    transition: .15s ease
 }
 
 .floor-menu {
     position: absolute;
     top: calc(100% + 10px);
     left: 0;
-
-    background: white;
+    background: #fff;
     border-radius: 14px;
     padding: 8px;
-
     display: flex;
     flex-direction: column;
     gap: 6px;
-
-    width: fit-content;
-
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
     opacity: 0;
-    transform: translateY(-8px) scale(0.98);
+    transform: translateY(-8px) scale(.98);
     pointer-events: none;
-
-    transition: 0.15s ease;
+    transition: .15s ease
 }
 
 .floor-menu.show {
     opacity: 1;
     transform: translateY(0) scale(1);
-    pointer-events: auto;
+    pointer-events: auto
 }
 
 .floor-item {
     all: unset;
     padding: 10px 12px;
     border-radius: 10px;
-
     cursor: pointer;
-
     font-family: Arial, sans-serif;
     font-size: 14px;
-
-    transition: 0.15s ease;
+    transition: .15s ease
 }
 
 .floor-item:hover {
-    background: #f2f2f2;
+    background: #f2f2f2
 }
 
-/* =========================
-   APP OVERLAY
-========================= */
-
+/* App/menu */
 .app-container {
     position: absolute;
     inset: 0;
     z-index: 1000;
-    pointer-events: none;
+    pointer-events: none
 }
-
-/* =========================
-   MENU BAR
-========================= */
 
 .menu-container {
     position: fixed;
     left: 50%;
     bottom: 14px;
     transform: translateX(-50%);
-
     width: calc(100% - 24px);
     max-width: 520px;
-
     padding: 14px 18px 22px;
-
     display: flex;
     justify-content: center;
     align-items: center;
     gap: clamp(8px, 3vw, 20px);
-
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, .72);
     backdrop-filter: blur(20px);
-
     border-radius: 30px;
-
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
-
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .35);
     z-index: 1001;
-
-    pointer-events: auto;
+    pointer-events: auto
 }
-
-/* =========================
-   BUTTONS
-========================= */
 
 .menu-box {
     width: clamp(52px, 15vw, 78px);
     height: clamp(52px, 15vw, 78px);
-
-    background: white;
+    background: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-
     border-radius: 22px;
-
     transform: translateY(-38%);
-    transition: 0.15s ease;
-
+    transition: .15s ease;
     cursor: pointer;
-    user-select: none;
+    user-select: none
 }
 
 .menu-box:active {
-    transform: translateY(-34%) scale(0.93);
-    background: #eef7fb;
+    transform: translateY(-34%) scale(.93);
+    background: #eef7fb
 }
 
 .menu-box i {
     font-size: clamp(22px, 7vw, 34px);
-    color: #19c3e6;
+    color: #19c3e6
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 768px) {
-    .menu-container {
-        bottom: 10px;
-        padding: 12px 14px 18px;
-        border-radius: 24px;
-    }
-
-    .menu-box {
-        border-radius: 18px;
-    }
-}
-
-/* =========================
-   GLOBAL
-========================= */
-
+/* Global reset */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-tap-highlight-color: transparent
 }
 
-html,
-body {
+html, body {
     width: 100%;
     height: 100%;
     overflow: hidden;
-    touch-action: manipulation;
+    touch-action: manipulation
 }
 
-/* Keep body neutral (don’t overpower map) */
 body {
     position: fixed;
     inset: 0;
     background: #0b1220;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif
 }
 
-/* =========================
-   MAP (ASH BASE FIX)
-========================= */
-
+/* Map base */
 #map {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100dvh;
     z-index: 1;
-
-    /* ash background */
-    background: radial-gradient(circle at center,
-            #f2f2f2 0%,
-            #d9d9d9 55%,
-            #cfcfcf 100%) !important;
+    background: radial-gradient(circle at center, #f2f2f2 0%, #d9d9d9 55%, #cfcfcf 100%) !important
 }
 
-/* Leaflet container must NOT override ash */
 .leaflet-container {
     background: transparent !important;
     font-family: inherit;
-    touch-action: pan-x pan-y;
+    touch-action: pan-x pan-y
 }
 
-/* Make SVG map blend into ash world */
 .leaflet-image-layer {
     filter: grayscale(20%) brightness(1.05) contrast(0.95);
-    opacity: 0.9;
+    opacity: .9
 }
 
-/* =========================
-   ZOOM CONTROLS
-========================= */
-
+/* Controls */
 .leaflet-control-zoom {
     border: none !important;
     border-radius: 16px !important;
     overflow: hidden;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, .25) !important
 }
 
 .leaflet-control-zoom a {
-    background: rgba(255, 255, 255, 0.95) !important;
+    background: rgba(255, 255, 255, .95) !important;
     color: #111 !important;
     width: 34px !important;
     height: 34px !important;
     line-height: 34px !important;
-    font-size: 18px !important;
+    font-size: 18px !important
 }
 
-/* =========================
-   POPUPS
-========================= */
-
+/* Popups & markers */
 .leaflet-popup-content-wrapper {
-    border-radius: 18px;
+    border-radius: 18px
 }
 
 .leaflet-popup-content {
     font-size: 14px;
-    margin: 10px 14px;
+    margin: 10px 14px
 }
-
-/* =========================
-   MARKERS
-========================= */
 
 .leaflet-marker-icon {
-    filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 10px rgba(0, 255, 255, 0.6));
+    filter: drop-shadow(0 0 4px cyan) drop-shadow(0 0 10px rgba(0, 255, 255, .6))
 }
 
-/* =========================
-   COORD DISPLAY
-========================= */
-
+/* UI overlays */
 .coords-display {
-    background: rgba(0, 0, 0, 0.72) !important;
-    color: white;
+    background: rgba(0, 0, 0, .72) !important;
+    color: #fff;
     padding: 8px 12px !important;
     border-radius: 12px;
     font-size: 12px;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px)
 }
 
-/* =========================
-   APP OVERLAY
-========================= */
+.action-container {
+    position: absolute;
+    right: 0;
+    top: 25%;
+    transform: translateY(-25%) translateX(-25%);
+    z-index: 1000
+}
+
+.action-container button {
+    align-items: center;
+    background: #fff;
+    border: 3px solid transparent;
+    border-radius: 50%;
+    box-shadow: 0 clamp(2px, 0.6vw, 6px) clamp(6px, 1.5vw, 14px) rgba(0, 0, 0, .12);
+    height: 40px;
+    width: 40px
+}
+
+.action-container button:hover {
+    background: #f2f2f2;
+    cursor: pointer
+}
+
+/* Floor menu */
+.fmenu-container {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    z-index: 1001
+}
+
+.floors-box {
+    all: unset;
+    width: clamp(46px, 12vw, 78px);
+    height: clamp(46px, 12vw, 78px);
+    background: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: clamp(14px, 2vw, 22px);
+    cursor: pointer;
+    user-select: none;
+    font-size: clamp(12px, 4vw, 20px);
+    font-family: 'Courier New', Courier, monospace;
+    box-shadow: 0 clamp(2px, 0.6vw, 6px) clamp(6px, 1.5vw, 14px) rgba(0, 0, 0, .12);
+    transition: .15s ease
+}
+
+.floor-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    background: #fff;
+    border-radius: 14px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: fit-content;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .15);
+    opacity: 0;
+    transform: translateY(-8px) scale(.98);
+    pointer-events: none;
+    transition: .15s ease
+}
+
+.floor-menu.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto
+}
+
+.floor-item {
+    all: unset;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    transition: .15s ease
+}
+
+.floor-item:hover {
+    background: #f2f2f2
+}
 
 .app-container {
     position: absolute;
     inset: 0;
     z-index: 1000;
-    pointer-events: none;
+    pointer-events: none
 }
 
-/* =========================
-   MENU BAR
-========================= */
-
+/* Bottom menu */
 .menu-container {
     position: fixed;
     left: 50%;
     bottom: 14px;
     transform: translateX(-50%);
-
     width: calc(100% - 24px);
     max-width: 520px;
-
     padding: 14px 18px 22px;
-
     display: flex;
     justify-content: center;
     align-items: center;
     gap: clamp(8px, 3vw, 20px);
-
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, .72);
     backdrop-filter: blur(20px);
-
     border-radius: 30px;
-
-    box-shadow:
-        0 8px 32px rgba(0, 0, 0, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
-
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .18), inset 0 1px 0 rgba(255, 255, 255, .35);
     z-index: 1001;
-
-    pointer-events: auto;
+    pointer-events: auto
 }
-
-/* =========================
-   BUTTONS
-========================= */
 
 .menu-box {
     width: clamp(52px, 15vw, 78px);
     height: clamp(52px, 15vw, 78px);
-
-    background: white;
+    background: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
-
     border-radius: 22px;
-
     transform: translateY(-38%);
-    transition: 0.15s ease;
-
+    transition: .15s ease;
     cursor: pointer;
-    user-select: none;
+    user-select: none
 }
 
 .menu-box:active {
-    transform: translateY(-34%) scale(0.93);
-    background: #eef7fb;
+    transform: translateY(-34%) scale(.93);
+    background: #eef7fb
 }
 
 .menu-box i {
     font-size: clamp(22px, 7vw, 34px);
-    color: #19c3e6;
+    color: #19c3e6
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 768px) {
+@media (max-width:768px) {
     .menu-container {
         bottom: 10px;
         padding: 12px 14px 18px;
-        border-radius: 24px;
+        border-radius: 24px
     }
 
     .menu-box {
-        border-radius: 18px;
+        border-radius: 18px
     }
 }

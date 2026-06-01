@@ -13,8 +13,6 @@ class Location(models.Model):
     def __str__(self):
         return self.room_name
     
-
-    
 class Connection(models.Model):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="from_conn")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="to_conn")

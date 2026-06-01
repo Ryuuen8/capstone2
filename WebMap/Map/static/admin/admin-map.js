@@ -156,7 +156,7 @@ function drawPath(pathData) {
         paused: false,
         reverse: false,
         hardwareAccelerated: true
-    }).addTo(map);
+    }).floors[loc.floor].layer.addLayer(polygon);
 }
 
 drawPath(path);
@@ -229,27 +229,42 @@ locations.forEach((loc) => {
 // =========================
 
 function switchFloor(floor) {
+
     if (!floors[floor]) return;
 
-    // remove current
     map.removeLayer(floors[currentFloor].image);
     map.removeLayer(floors[currentFloor].layer);
     map.removeLayer(floors[currentFloor].drawLayer);
+
     if (currentPath) {
         map.removeLayer(currentPath);
     }
+
     currentFloor = floor;
 
-    // add new
     map.addLayer(floors[currentFloor].image);
     map.addLayer(floors[currentFloor].layer);
     map.addLayer(floors[currentFloor].drawLayer);
 
-    if (drawControl && drawControl.options && drawControl.options.edit) {
-        drawControl.options.edit.featureGroup = floors[currentFloor].drawLayer;
-    }
-}
+    // recreate draw toolbar
+    map.removeControl(drawControl);
 
+    drawControl = new L.Control.Draw({
+        draw: {
+            polygon: true,
+            rectangle: true,
+            polyline: false,
+            circle: false,
+            marker: false,
+            circlemarker: false
+        },
+        edit: {
+            featureGroup: floors[currentFloor].drawLayer
+        }
+    });
+
+    map.addControl(drawControl);
+}
 document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".floor-item").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -265,7 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // ======================================================
 
 // DRAW CONTROL
-const drawControl = new L.Control.Draw({
+let drawControl = new L.Control.Draw({
     draw: {
         polygon: true,
         rectangle: true,
@@ -348,65 +363,59 @@ async function saveRooms() {
         return;
     }
 
-    // 🔥 Ask names BEFORE mapping (safe context)
-    window.saveRooms = async function () {
+    const rooms = [];
 
-        console.log("saveRooms STARTED");
+    // =========================
+    // 1. ASK NAMES FIRST (SAFE)
+    // =========================
+    for (let i = 0; i < layers.length; i++) {
 
-        const drawLayer = floors[currentFloor].drawLayer;
+        const layer = layers[i];
+        const points = layer.getLatLngs()[0];
+        const center = getCenter(points);
 
-        console.log("currentFloor:", currentFloor);
-        console.log("drawLayer:", drawLayer);
+        let name = prompt(`Name for Node ${i}:`);
 
-        const layers = drawLayer.getLayers();
-
-        console.log("layers found:", layers);
-
-        if (!layers || layers.length === 0) {
-            alert("No rooms drawn yet!");
-            console.log("EXIT: no layers");
-            return;
+        if (!name || name.trim() === "") {
+            name = `${i}`;
         }
 
-        const rooms = layers.map((layer, i) => {
+        rooms.push({
+            room_name: name.trim(),
+            floor: currentFloor,
+            polygon: points.map(p => [p.lat, p.lng]),
+            center_x: center.x,
+            center_y: center.y
+        });
+    }
 
-            const points = layer.getLatLngs()[0];
-            const center = getCenter(points);
+    console.log("📦 Saving rooms:", rooms);
 
-            return {
-                room_name: `Room ${currentFloor}-${i + 1}`,
-                floor: currentFloor,
-                polygon: points.map(p => [p.lat, p.lng]),
-                center_x: center.x,
-                center_y: center.y
-            };
+    // =========================
+    // 2. SEND TO BACKEND
+    // =========================
+    try {
+        const response = await fetch("/save-room/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCSRFToken()
+            },
+            body: JSON.stringify({ rooms })
         });
 
-        console.log("📤 rooms payload:", rooms);
-
-        try {
-            const res = await fetch("save-room/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": getCSRFToken()
-                },
-                body: JSON.stringify({ rooms })
-            });
-
-            console.log("📡 response status:", res.status);
-
-            const text = await res.text();
-            console.log("📥 raw response:", text);
-
-            alert("Save complete (check console)");
-
-        } catch (err) {
-            console.error("💥 FETCH ERROR:", err);
+        if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text);
         }
+
+        const data = await response.json();
+
+        console.log("✅ Saved:", data);
+        alert("Rooms saved successfully");
+
+    } catch (err) {
+        console.error("💥 Save failed:", err);
+        alert("Save failed (check console)");
     }
 }
-map.on('draw:created', function (e) {
-    console.log("DRAW WORKS:", e.layer);
-    e.layer.addTo(map);
-}); 
