@@ -18,10 +18,7 @@
               href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
         <!-- Barcode Scanner -->
         <script src="https://cdn.jsdelivr.net/npm/dynamsoft-barcode-reader-bundle@11.2.4000/dist/dbr.bundle.js"></script>
-        <!-- QR Scanner Library (free alternative) -->
-        <script src="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.umd.min.js"></script>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/qr-scanner@1.4.2/qr-scanner.min.css">
-        <!-- jsQR fallback for image decoding (no worker required) -->
+        <!-- jsQR for camera-based QR decoding -->
         <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
         <!-- Leaflet JavaScript -->
         <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
@@ -96,7 +93,9 @@
                 // Use native camera + jsQR to avoid worker import issues
                 if (qrScanner && qrScanner._stream) {
                     // already scanning: stop
-                    try { qrScanner._stream.getTracks().forEach(t=>t.stop()); } catch(_){}
+                    try {
+                        qrScanner._stream.getTracks().forEach(t => t.stop());
+                    } catch (_) {}
                     qrScanner = null;
                     const existing = document.getElementById('qr-scanner-temp');
                     if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
@@ -138,16 +137,26 @@
                 const ctx = canvas.getContext('2d');
 
                 function stopScanning() {
-                    try { if (stream) stream.getTracks().forEach(t=>t.stop()); } catch(e){}
+                    try {
+                        if (stream) stream.getTracks().forEach(t => t.stop());
+                    } catch (e) {}
                     if (scannerContainer && scannerContainer.parentNode) scannerContainer.parentNode.removeChild(scannerContainer);
                     qrScanner = null;
                 }
 
-                cancelBtn.addEventListener('click', () => { stopScanning(); });
+                cancelBtn.addEventListener('click', () => {
+                    stopScanning();
+                });
 
                 try {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    qrScanner = { _stream: stream };
+                    stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            facingMode: 'environment'
+                        }
+                    });
+                    qrScanner = {
+                        _stream: stream
+                    };
                     video.srcObject = stream;
                     await video.play();
 
@@ -185,64 +194,6 @@
                     alert('Camera access failed or not available. Use image upload instead.');
                 }
             }
-
-            async function handleFileSelect(input) {
-                const file = input.files && input.files[0];
-                if (!file) return;
-
-                try {
-                    // Try ImageBitmap + jsQR first (fast and avoids workers)
-                    if ('createImageBitmap' in window) {
-                        try {
-                            const bitmap = await createImageBitmap(file);
-                            const canvas = document.createElement('canvas');
-                            canvas.width = bitmap.width;
-                            canvas.height = bitmap.height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(bitmap, 0, 0);
-                            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                            const code = jsQR(imageData.data, canvas.width, canvas.height);
-                            if (code && code.data) {
-                                processScannedUrl(code.data);
-                                input.value = '';
-                                return;
-                            }
-                        } catch (err) {
-                            console.debug('ImageBitmap path failed', err);
-                        }
-                    }
-
-                    // Fallback: load into an HTMLImageElement and use jsQR
-                    const dataUrl = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(file);
-                    });
-
-                    const img = new Image();
-                    img.src = dataUrl;
-                    await img.decode();
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = img.naturalWidth || img.width;
-                    canvas.height = img.naturalHeight || img.height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0);
-                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const code = jsQR(imageData.data, canvas.width, canvas.height);
-                    if (code && code.data) {
-                        processScannedUrl(code.data);
-                        input.value = '';
-                        return;
-                    }
-                } catch (err) {
-                    console.error('File decode failed', err);
-                }
-
-                alert('No QR code found in selected image. Try a clearer photo or a generated PNG.');
-                input.value = '';
-            }
         </script>
         {% block extra_head %}
         {% endblock extra_head %}
@@ -263,14 +214,11 @@
                 <span>Map</span>
             </a>
             <!-- CENTER SCAN BUTTON -->
-            <div id="reader" class="scan-btn-container"></div>
-            <input type="file" id="qr-file-input" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
-            <a onclick="document.getElementById('qr-file-input').click()" class="scan-btn" title="Upload QR image">
-                <i class="fa fa-upload"></i>
-            </a>
-            <a onclick="scan()" class="scan-btn">
-                <i class="fa fa-qrcode"></i>
-            </a>
+            <div id="reader" class="scan-btn-container">
+                <a onclick="scan()" class="scan-btn">
+                    <i class="fa fa-qrcode"></i>
+                </a>
+            </div>
             <a href="{% url 'emergency' %}"
                class="{% block nav_emergency %}{% endblock %}">
                 <i class="fa fa-exclamation-circle"></i>

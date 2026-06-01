@@ -432,18 +432,23 @@ body::-webkit-scrollbar {
     transform: translateX(-50%);
     width: 100%;
     max-width: 390px;
-    height: 75px;
-
+    height: 80px;
     background: white;
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
-
+    padding: 0 14px;
     border-top: 1px solid #ddd;
     z-index: 9999;
 }
 
-.bottom-nav a {
+.bottom-nav>a,
+.bottom-nav .scan-btn-container {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+.bottom-nav a:not(.scan-btn) {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -451,6 +456,8 @@ body::-webkit-scrollbar {
     color: #777;
     text-decoration: none;
     font-size: .65rem;
+    position: relative;
+    z-index: 1;
 }
 
 .bottom-nav i {
@@ -462,23 +469,27 @@ body::-webkit-scrollbar {
 }
 
 .scan-btn-container {
-    right: 59%;
-    transform: translateX(10%);
-    bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .scan-btn {
-    width: 60px;
-    height: 60px;
+    position: relative;
+    bottom: 14px;
+    width: 70px;
+    height: 70px;
+    flex: 0 0 auto;
     background: white;
     background: linear-gradient(white, white) padding-box,
         linear-gradient(to right, rgb(93, 93, 245), rgb(118, 105, 192)) border-box;
-    border-radius: 50em;
-    border: 3px solid transparent;
-    margin-top: -35px;
+    border-radius: 50%;
+    border: 3px solid white;
     display: flex !important;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 6px 20px rgba(45, 92, 255, 0.18);
+    z-index: 9999;
 }
 
 .scan-btn i {
