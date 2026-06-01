@@ -65,7 +65,7 @@
 
             function processScannedUrl(scannedUrl) {
                 try {
-                    if (scannedUrl.includes('/locate/')) {
+                    if (scannedUrl.includes('/locate/') || scannedUrl.includes('/map/locate/')) {
                         const url = new URL(scannedUrl);
                         const x = url.searchParams.get('x');
                         const y = url.searchParams.get('y');

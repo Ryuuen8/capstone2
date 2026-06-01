@@ -132,18 +132,41 @@ var path = JSON.parse(
 );
 
 // HANDLE SCANNED QR CODE LOCATION
+function getQueryParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
+}
+
 function handleScannedLocation() {
-    const scannedData = sessionStorage.getItem('scannedLocation');
+    let scannedData = sessionStorage.getItem('scannedLocation');
+
+    if (!scannedData) {
+        const x = getQueryParam('x');
+        const y = getQueryParam('y');
+        const floor = getQueryParam('floor');
+        const name = getQueryParam('name');
+
+        if (x && y && floor) {
+            scannedData = JSON.stringify({
+                x: parseFloat(x),
+                y: parseFloat(y),
+                floor: parseInt(floor, 10),
+                name: name
+            });
+            history.replaceState(null, '', window.location.pathname);
+        }
+    }
+
     if (!scannedData) return;
-    
+
     try {
         const location = JSON.parse(scannedData);
         sessionStorage.removeItem('scannedLocation');
-        
+
         // Switch to the correct floor
         currentFloor = location.floor;
         switchFloor(location.floor);
-        
+
         // Create a marker at the scanned coordinates
         const marker = L.circleMarker([location.y, location.x], {
             radius: 15,
@@ -154,7 +177,7 @@ function handleScannedLocation() {
             fillOpacity: 0.7,
             zIndex: 1000
         });
-        
+
         marker.bindPopup(`
             <div style="text-align: center; padding: 10px;">
                 <strong>${location.name || 'QR Location'}</strong><br>
@@ -163,13 +186,13 @@ function handleScannedLocation() {
                 Floor: ${location.floor}
             </div>
         `);
-        
+
         floors[location.floor].layer.addLayer(marker);
         marker.openPopup();
-        
+
         // Center map on the scanned location
         map.setView([location.y, location.x], 2);
-        
+
         console.log('Scanned location displayed:', location);
     } catch (error) {
         console.error('Error handling scanned location:', error);

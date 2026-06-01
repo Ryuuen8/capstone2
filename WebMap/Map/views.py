@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.templatetags.static import static
 from django.http import JsonResponse
 from folium.plugins import MousePosition, AntPath, Search
@@ -24,42 +24,30 @@ def emergency(request):
 
 def locate(request):
     """Handle QR code scans with coordinates.
-    
+
     Expects URL params: x, y, floor, name
-    Returns JSON with location info or redirects to map view.
+    Redirects to the map page so both in-app and external scans work.
     """
     x = request.GET.get('x')
     y = request.GET.get('y')
     floor = request.GET.get('floor')
     name = request.GET.get('name')
-    
+
     if not all([x, y, floor]):
         return JsonResponse({"error": "Missing coordinates"}, status=400)
-    
+
     try:
         x = float(x)
         y = float(y)
         floor = int(floor)
     except ValueError:
         return JsonResponse({"error": "Invalid coordinate format"}, status=400)
-    
-    # Try to find the location by name if provided
-    location = None
+
+    query_string = f"?x={x}&y={y}&floor={floor}"
     if name:
-        location = Location.objects.filter(room_name__iexact=name).first()
-    
-    return JsonResponse({
-        "x": x,
-        "y": y,
-        "floor": floor,
-        "name": name,
-        "location": {
-            "room_name": location.room_name,
-            "floor": location.floor_location,
-            "x": location.x_coordinate,
-            "y": location.y_coordinate,
-        } if location else None
-    })
+        query_string += f"&name={name}"
+
+    return redirect(f"/map/{query_string}")
 
 def pathfind(request):
     """Handle POST requests to compute a path between two rooms.
