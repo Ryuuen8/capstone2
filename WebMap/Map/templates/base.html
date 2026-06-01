@@ -214,10 +214,11 @@
                 <span>Map</span>
             </a>
             <!-- CENTER SCAN BUTTON -->
-            <div id="reader" class="scan-btn-container"></div>
-            <a onclick="scan()" class="scan-btn">
-                <i class="fa fa-qrcode"></i>
-            </a>
+            <div id="reader" class="scan-btn-container">
+                <a onclick="scan()" class="scan-btn">
+                    <i class="fa fa-qrcode"></i>
+                </a>
+            </div>
             <a href="{% url 'emergency' %}"
                class="{% block nav_emergency %}{% endblock %}">
                 <i class="fa fa-exclamation-circle"></i>
