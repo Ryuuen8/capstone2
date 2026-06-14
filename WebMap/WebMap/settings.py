@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 
@@ -123,13 +124,11 @@ USE_I18N = True
 
 USE_TZ = True
 
-import os
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static', 'jst', 'serviceworker.js')
 
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/jst', 'serviceworker.js')
-
-PWA_APP_NAME = 'Test'
-PWA_APP_DESCRIPTION = "Test PWA"
-PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_NAME = 'ICCT Indoor Navigation'
+PWA_APP_DESCRIPTION = 'Indoor navigation and emergency guide for ICCT Colleges Cainta'
+PWA_APP_THEME_COLOR = '#1565c0'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
 PWA_APP_DISPLAY = 'standalone'
 PWA_APP_SCOPE = '/'
@@ -138,23 +137,30 @@ PWA_APP_START_URL = '/'
 PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
     {
-        'src': 'static/icons/Gigachad-PNG-Pic.png',
-        'sizes': '160x160',
-        'type': 'image/png',
-    }
+        'src': '/static/images/Exit_icon.svg',
+        'sizes': '512x512',
+        'type': 'image/svg+xml',
+        'purpose': 'any',
+    },
+    {
+        'src': '/static/images/Exit_icon.svg',
+        'sizes': '512x512',
+        'type': 'image/svg+xml',
+        'purpose': 'maskable',
+    },
 ]
 PWA_APP_ICONS_APPLE = [
     {
-        'src': '/static/icons/Gigachad-PNG-Pic.png',
-        'sizes': '160x160',
-        'type': 'image/png',
-    }
+        'src': '/static/images/Exit_icon.svg',
+        'sizes': '180x180',
+        'type': 'image/svg+xml',
+    },
 ]
 PWA_APP_SPLASH_SCREEN = [
     {
-        'src': '/static/icons/Gigachad-PNG-Pic.png',
-        'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
-    }
+        'src': '/static/images/Exit_icon.svg',
+        'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)',
+    },
 ]
 PWA_APP_DIR = 'ltr'
 PWA_APP_LANG = 'en-US'
@@ -169,11 +175,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 STATICFILES_DIRS = [
-    BASE_DIR / 'Map/static'
+    BASE_DIR / 'Map/static',
+    BASE_DIR / 'static',
 ]
-from pathlib import Path
-
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

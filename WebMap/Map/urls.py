@@ -14,6 +14,7 @@ urlpatterns = [
     path('map/', views.index, name='mainmap'),
     path('pathfind/', views.pathfind, name="pathfind"),
     path('emergency/', views.emergency, name="emergency"),
+    path('offline/', views.offline, name="offline"),
     path('locate/', views.locate, name="locate"),
     path('admin-dashboard/', views.admin_dashboard, name="adminds"),
     path('admin-editor/', views.admin_management, name="map-editor"),

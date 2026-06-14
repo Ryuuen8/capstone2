@@ -56,6 +56,9 @@ def floormap(request):
 def emergency(request):
     return render(request, 'emergencty.html')
 
+def offline(request):
+    return render(request, 'offline.html')
+
 def search(request):
     query = request.GET.get('term', '')     
     products = Location.objects.filter(name__icontains=query)[:10]
