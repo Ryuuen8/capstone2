@@ -125,28 +125,40 @@ USE_TZ = True
 
 import os
 
-PWA_APP_NAME = "My Django App"
-PWA_APP_DESCRIPTION = "A Django Progressive Web App"
-PWA_APP_THEME_COLOR = "#000000"
-PWA_APP_BACKGROUND_COLOR = "#ffffff"
-PWA_APP_DISPLAY = "standalone"
-PWA_APP_SCOPE = "/"
-PWA_APP_ORIENTATION = "any"
-PWA_APP_START_URL = "/"
-PWA_APP_STATUS_BAR_COLOR = "default"
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 
+PWA_APP_NAME = 'Test'
+PWA_APP_DESCRIPTION = "Test PWA"
+PWA_APP_THEME_COLOR = '#000000'
+PWA_APP_BACKGROUND_COLOR = '#ffffff'
+PWA_APP_DISPLAY = 'standalone'
+PWA_APP_SCOPE = '/'
+PWA_APP_ORIENTATION = 'any'
+PWA_APP_START_URL = '/'
+PWA_APP_STATUS_BAR_COLOR = 'default'
 PWA_APP_ICONS = [
     {
-        "src": "map/static/icons/Gigachad-PNG-Pic.png",
-        "sizes": "192x192"
-    },
-    {
-        "src": "map/static/icons/Gigachad-PNG-Pic.png",
-        "sizes": "512x512"
+        'src': 'static/icons/Gigachad-PNG-Pic.png',
+        'sizes': '160x160',
+        'type': 'image/png',
     }
 ]
+PWA_APP_ICONS_APPLE = [
+    {
+        'src': '/static/icons/Gigachad-PNG-Pic.png',
+        'sizes': '160x160',
+        'type': 'image/png',
+    }
+]
+PWA_APP_SPLASH_SCREEN = [
+    {
+        'src': '/static/icons/Gigachad-PNG-Pic.png',
+        'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
+    }
+]
+PWA_APP_DIR = 'ltr'
+PWA_APP_LANG = 'en-US'
 
-PWA_SERVICE_WORKER_PATH = "js/serviceworker.js"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
@@ -157,7 +169,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    BASE_DIR / 'Map/static'
 ]
 from pathlib import Path
 
