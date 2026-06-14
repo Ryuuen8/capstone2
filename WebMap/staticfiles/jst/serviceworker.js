@@ -20,6 +20,11 @@ const APP_STATIC = [
     "/static/js/script.js",
     "/static/js/map.js",
     "/static/images/Exit_icon.svg",
+    "/static/images/first-floor.svg",
+    "/static/images/second-floor.svg",
+    "/static/images/third-floor.svg",
+    "/static/images/fourth-floor.svg",
+    "/static/images/fifth-floor.svg",
 ];
 
 const CDN_ASSETS = [
