@@ -137,16 +137,16 @@ PWA_APP_STATUS_BAR_COLOR = "default"
 
 PWA_APP_ICONS = [
     {
-        "src": "/static/icons/Gigachad-PNG-Pic.png",
+        "src": "map/static/icons/Gigachad-PNG-Pic.png",
         "sizes": "192x192"
     },
     {
-        "src": "/static/icons/Gigachad-PNG-Pic.png",
+        "src": "map/static/icons/Gigachad-PNG-Pic.png",
         "sizes": "512x512"
     }
 ]
 
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, "static/js/serviceworker.js")
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, "map/static/js/serviceworker.js")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
