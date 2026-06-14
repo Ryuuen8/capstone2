@@ -146,7 +146,7 @@ PWA_APP_ICONS = [
     }
 ]
 
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, "map/static/js/serviceworker.js")
+PWA_SERVICE_WORKER_PATH = "js/serviceworker.js"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
