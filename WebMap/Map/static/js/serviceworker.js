@@ -1,25 +1,20 @@
-var staticCacheName = 'djangopwa-v1';
+const CACHE_NAME = "my-django-pwa-v1";
 
-self.addEventListener('install', function (event) {
+const urlsToCache = [
+    "/",
+];
+
+self.addEventListener("install", (event) => {
     event.waitUntil(
-        caches.open(staticCacheName).then(function (cache) {
-            return cache.addAll([
-                '',
-            ]);
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.addAll(urlsToCache);
         })
     );
 });
 
-self.addEventListener('fetch', function (event) {
-    var requestUrl = new URL(event.request.url);
-    if (requestUrl.origin === location.origin) {
-        if ((requestUrl.pathname === '/')) {
-            event.respondWith(caches.match(''));
-            return;
-        }
-    }
+self.addEventListener("fetch", (event) => {
     event.respondWith(
-        caches.match(event.request).then(function (response) {
+        caches.match(event.request).then((response) => {
             return response || fetch(event.request);
         })
     );
