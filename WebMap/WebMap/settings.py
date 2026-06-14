@@ -125,7 +125,7 @@ USE_TZ = True
 
 import os
 
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
+PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/jst', 'serviceworker.js')
 
 PWA_APP_NAME = 'Test'
 PWA_APP_DESCRIPTION = "Test PWA"
